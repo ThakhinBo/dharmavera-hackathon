@@ -1,0 +1,130 @@
+# --- 2026-09-29 MOVED: this old server is retired; dharmavera.com now runs on 45.95.185.101 ---
+RewriteEngine On
+RewriteCond %{HTTP_HOST} dharmavera\.com$ [NC]
+RewriteCond %{REQUEST_URI} !^/offline\.html$
+RewriteCond %{REQUEST_URI} !^/\.well-known/
+RewriteCond %{REQUEST_URI} !\.(css|png|ico|webp|svg|webmanifest)$
+RewriteRule ^ /offline.html [R=503,L]
+ErrorDocument 503 /offline.html
+# --- end MOVED ---
+
+# ═══════════════════════════════════════════════
+#  DharmaVera.com — Myanmar Astrology & Biorhythm
+# ═══════════════════════════════════════════════
+
+# ── Enable PHP via CGI (Virtualmin) ──────────────
+AddType application/x-httpd-php8.4 .php
+
+# ── Web app manifest (Android / installable app) ─
+AddType application/manifest+json .webmanifest
+
+# ── Renamed pages ────────────────────────────────
+Redirect 301 /mbti.html /personality.html
+
+# ── Directory index ──────────────────────────────
+DirectoryIndex index.php
+
+# ── No directory listing ─────────────────────────
+Options -Indexes
+
+# ── Canonical host + HTTPS ───────────────────────
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # Let certificate renewals answer HTTP challenges on legacy hostnames.
+    RewriteRule ^\.well-known/(acme-challenge|pki-validation)/ - [L]
+    # 2026-10-26: this copy now serves southrule.com (dharmavera.com lives on the new server)
+    RewriteCond %{HTTPS} !=on [OR]
+    RewriteCond %{HTTP_HOST} !^southrule\.com$ [NC]
+    RewriteRule ^ https://southrule.com%{REQUEST_URI} [R=301,L]
+</IfModule>
+
+# ── Security headers ─────────────────────────────
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    Header always set Strict-Transport-Security "max-age=31536000"
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' https://cdn.jsdelivr.net; img-src 'self' data: https://tile.openstreetmap.org; connect-src 'self' https://nominatim.openstreetmap.org; frame-ancestors 'none'"
+</IfModule>
+
+# ── Block sensitive file types ────────────────────
+<FilesMatch "\.(sql|log|env|md|gitignore|sh|bak|old|orig|tmp|ini|conf|yaml|yml|lock|json)$">
+    Require all denied
+</FilesMatch>
+
+# ── Android app: Digital Asset Links must be public ──
+<Files "assetlinks.json">
+    Require all granted
+    ForceType application/json
+</Files>
+
+# ── Private notes must never be served ──
+<Files "kai.txt">
+    Require all denied
+</Files>
+
+# ── Block direct access to config-like PHP files ──
+<FilesMatch "^(config|database|db|setup|install|backup|auth).*\.php$">
+    Require all denied
+</FilesMatch>
+
+# ── Block hidden files (.git, .env etc.) ──────────
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# ── Block script injection / SQL injection attempts ──
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Null bytes
+    RewriteCond %{QUERY_STRING} \0 [NC]
+    RewriteRule .* - [F,L]
+
+    # SQL injection keywords in query string
+    RewriteCond %{QUERY_STRING} (union.*select|insert.*into|drop.*table|delete.*from|update.*set) [NC]
+    RewriteRule .* - [F,L]
+
+    # XSS / script injection
+    RewriteCond %{QUERY_STRING} (<script|%3Cscript|javascript:|base64_encode) [NC]
+    RewriteRule .* - [F,L]
+
+    # Remote file inclusion
+    RewriteCond %{QUERY_STRING} (http|https|ftp):// [NC]
+    RewriteRule .* - [F,L]
+
+    # Block common exploit scanners / bad bots
+    RewriteCond %{HTTP_USER_AGENT} (nikto|sqlmap|nmap|masscan|zgrab|dirbuster|gobuster|wfuzz|hydra) [NC]
+    RewriteRule .* - [F,L]
+</IfModule>
+
+# ── Prevent image hotlinking ──────────────────────
+<IfModule mod_rewrite.c>
+    RewriteCond %{HTTP_REFERER} !^$
+    RewriteCond %{HTTP_REFERER} !^https?://(www\.)?southrule\.com(?:[/:]|$) [NC]
+    RewriteRule \.(jpg|jpeg|png|gif|webp|svg|ico)$ - [F,L]
+</IfModule>
+
+# ── Browser caching for static assets ────────────
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css                  "access plus 1 month"
+    ExpiresByType application/javascript    "access plus 1 month"
+    ExpiresByType image/png                 "access plus 6 months"
+    ExpiresByType image/jpeg                "access plus 6 months"
+    ExpiresByType image/webp                "access plus 6 months"
+    ExpiresByType image/svg+xml             "access plus 6 months"
+    ExpiresByType image/x-icon              "access plus 1 year"
+</IfModule>
+
+# ── Service worker must always be re-checked so app updates arrive ──
+<IfModule mod_headers.c>
+    <Files "sw.js">
+        Header set Cache-Control "no-cache, max-age=0"
+    </Files>
+</IfModule>
+
+# ── Hide server info ──────────────────────────────
+ServerSignature Off

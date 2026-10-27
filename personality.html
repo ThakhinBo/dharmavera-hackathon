@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101d21">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/favicon.ico?v=2" sizes="any">
+<link rel="icon" type="image/png" sizes="192x192" href="/app-icons/icon-192.png?v=2">
+<link rel="apple-touch-icon" href="/app-icons/apple-touch-icon.png?v=2">
+<title>Personality Preference Guide & Quick Check — DharmaVera</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+  :root {
+    --bg-dark:#0d1117; --bg-card:#161b22; --bg-card2:#1c2128; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff; --accent2:#c77dff;
+    --c-nt:var(--accent2); --c-nf:#4FC3F7; --c-sj:#f0ad4e; --c-sp:#FF6B35;
+  }
+  * { box-sizing:border-box; }
+  body { background:var(--bg-dark); color:var(--text); font-family:'Segoe UI',system-ui,sans-serif; }
+
+  /* Hero */
+  .hero { background:linear-gradient(135deg,#0d1117,#11192e,#0d2137); border-bottom:1px solid var(--border); }
+  .hero-accent { height:3px; background:linear-gradient(90deg,#FF6B35,#4FC3F7,#58a6ff,#c77dff); }
+
+  /* Type card */
+  .type-card { background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:1.5rem; margin-bottom:1rem; scroll-margin-top:80px; transition:border-color .2s; }
+  .type-card:hover { border-color:var(--accent); }
+  .type-code { font-size:1.8rem; font-weight:900; letter-spacing:2px; line-height:1; }
+  .type-name { font-size:.88rem; font-weight:600; color:var(--muted); margin-top:.2rem; }
+  .type-emoji { font-size:2.4rem; line-height:1; }
+  .trait-bar-wrap { display:none; }
+  .trait-bar { height:100%; border-radius:4px; transition:width .6s ease; }
+  .trait-label { font-size:.7rem; color:var(--muted); display:flex; justify-content:space-between; margin-bottom:2px; }
+  .trait-label span:last-child { display:none; }
+
+  /* Temperament section headers */
+  .temp-header { display:flex; align-items:center; gap:.75rem; margin:2rem 0 1rem; padding-bottom:.5rem; border-bottom:2px solid; }
+  .temp-header h2 { margin:0; font-size:1.1rem; font-weight:800; }
+  .temp-desc { font-size:.85rem; color:#ccc; line-height:1.7; margin-bottom:1.5rem; }
+
+  .quick-check { scroll-margin-top:80px; background:linear-gradient(135deg,rgba(88,166,255,.09),rgba(199,125,255,.10)); border:1px solid rgba(199,125,255,.42); border-radius:14px; padding:1.25rem; }
+  .quick-q { background:rgba(13,17,23,.62); border:1px solid var(--border); border-radius:10px; padding:.85rem 1rem; margin-bottom:.65rem; }
+  .quick-q legend { font-size:.84rem; color:var(--text); margin-bottom:.6rem; }
+  .quick-choice { display:block; font-size:.8rem; color:#ccc; margin:.35rem 0; cursor:pointer; }
+  .quick-choice input { accent-color:var(--accent2); margin-right:.45rem; }
+  .quick-result { display:none; background:var(--bg-card); border:1px solid var(--accent2); border-radius:12px; padding:1rem; margin-top:1rem; }
+
+  /* Sticky nav */
+  .sticky-nav { position:sticky; top:0; z-index:100; background:var(--bg-dark); border-bottom:1px solid var(--border); padding:.5rem 0; }
+  .type-nav-btn { background:var(--bg-card2); border:1px solid var(--border); color:var(--muted); border-radius:8px; padding:3px 10px; font-size:.78rem; font-weight:700; cursor:pointer; text-decoration:none; display:inline-block; transition:all .15s; }
+  .type-nav-btn:hover { color:var(--text); border-color:var(--accent); }
+
+  /* Dimension explanation */
+  .dim-card { background:var(--bg-card2); border:1px solid var(--border); border-radius:10px; padding:1rem 1.25rem; }
+  .dim-vs { font-size:.75rem; color:var(--muted); margin:.3rem 0; }
+
+  footer { color:var(--muted); font-size:.8rem; border-top:1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-accent"></div>
+  <div class="container py-4" style="max-width:960px">
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+      <div style="font-size:2rem">🧠</div>
+      <div>
+        <h1 style="font-size:1.5rem;font-weight:800;color:#fff;margin:0">Personality Preferences — Quick Check & 16-Type Guide</h1>
+        <p style="color:var(--muted);margin:0;font-size:.85rem">A short self-reflection tool for DharmaVera Harmony readings</p>
+      </div>
+      <a href="biorhythm.php" class="btn btn-outline-secondary btn-sm ms-auto"><i class="bi bi-arrow-left me-1"></i>Back to App</a>
+    </div>
+  </div>
+</div>
+
+<!-- Sticky type nav -->
+<div class="sticky-nav">
+  <div class="container" style="max-width:960px">
+    <div class="d-flex flex-wrap gap-1">
+      <span style="font-size:.7rem;color:var(--muted);align-self:center;margin-right:.25rem">Jump to:</span>
+      <a href="#INTJ" class="type-nav-btn">INTJ</a><a href="#INTP" class="type-nav-btn">INTP</a>
+      <a href="#INFJ" class="type-nav-btn">INFJ</a><a href="#INFP" class="type-nav-btn">INFP</a>
+      <a href="#ENTJ" class="type-nav-btn">ENTJ</a><a href="#ENTP" class="type-nav-btn">ENTP</a>
+      <a href="#ENFJ" class="type-nav-btn">ENFJ</a><a href="#ENFP" class="type-nav-btn">ENFP</a>
+      <a href="#ISTJ" class="type-nav-btn">ISTJ</a><a href="#ISTP" class="type-nav-btn">ISTP</a>
+      <a href="#ISFJ" class="type-nav-btn">ISFJ</a><a href="#ISFP" class="type-nav-btn">ISFP</a>
+      <a href="#ESTJ" class="type-nav-btn">ESTJ</a><a href="#ESTP" class="type-nav-btn">ESTP</a>
+      <a href="#ESFJ" class="type-nav-btn">ESFJ</a><a href="#ESFP" class="type-nav-btn">ESFP</a>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4" style="max-width:960px">
+
+  <!-- About the 16 personality types -->
+  <div class="dim-card mb-4">
+    <h2 style="font-size:1rem;font-weight:700;color:var(--accent);margin-bottom:.75rem"><i class="bi bi-question-circle me-2"></i>About the 16 Personality Types</h2>
+    <p style="font-size:.88rem;color:#ccc;line-height:1.8;margin-bottom:.75rem">The 16 personality types grow out of Carl Jung's theory of psychological types and were popularised by the Myers-Briggs Type Indicator (MBTI®). DharmaVera uses the familiar four-letter codes as a simple reflection framework; it is not affiliated with or endorsed by The Myers-Briggs Company. Each person is described by four preferences across four dimensions:</p>
+    <div class="row g-3">
+      <div class="col-sm-6"><div class="dim-card" style="border-left:3px solid var(--accent)">
+        <div style="font-weight:700;color:var(--accent);font-size:.88rem">E / I — Energy Direction</div>
+        <div class="dim-vs">Extraversion vs Introversion</div>
+        <div style="font-size:.82rem;color:#ccc">Where you get your energy. <strong style="color:var(--text)">E</strong> = energised by people and activity. <strong style="color:var(--text)">I</strong> = recharged by solitude and inner reflection.</div>
+      </div></div>
+      <div class="col-sm-6"><div class="dim-card" style="border-left:3px solid var(--c-nf)">
+        <div style="font-weight:700;color:var(--c-nf);font-size:.88rem">S / N — Information Gathering</div>
+        <div class="dim-vs">Sensing vs Intuition</div>
+        <div style="font-size:.82rem;color:#ccc">How you take in the world. <strong style="color:var(--text)">S</strong> = focuses on facts and present reality. <strong style="color:var(--text)">N</strong> = drawn to patterns, possibilities, and the future.</div>
+      </div></div>
+      <div class="col-sm-6"><div class="dim-card" style="border-left:3px solid var(--c-sp)">
+        <div style="font-weight:700;color:var(--c-sp);font-size:.88rem">T / F — Decision Making</div>
+        <div class="dim-vs">Thinking vs Feeling</div>
+        <div style="font-size:.82rem;color:#ccc">How you make decisions. <strong style="color:var(--text)">T</strong> = logic, objectivity, and cause-effect analysis. <strong style="color:var(--text)">F</strong> = values, harmony, and impact on people.</div>
+      </div></div>
+      <div class="col-sm-6"><div class="dim-card" style="border-left:3px solid var(--c-sj)">
+        <div style="font-weight:700;color:var(--c-sj);font-size:.88rem">J / P — Lifestyle Approach</div>
+        <div class="dim-vs">Judging vs Perceiving</div>
+        <div style="font-size:.82rem;color:#ccc">How you organise your life. <strong style="color:var(--text)">J</strong> = prefers structure, plans, and closure. <strong style="color:var(--text)">P</strong> = prefers flexibility, spontaneity, and open options.</div>
+      </div></div>
+    </div>
+    <div style="font-size:.78rem;color:var(--muted);line-height:1.65;margin-top:1rem;padding-top:.8rem;border-top:1px solid var(--border)">
+      These are preferences, not abilities or fixed limits. All types are equally valuable, and no type pairing is inherently more successful in relationships. Your best-fit type is the one you decide describes you after reflection.
+      <a href="https://www.myersbriggs.org/my-mbti-personality-type/the-mbti-preferences/" target="_blank" rel="noopener" style="color:var(--accent)">The Myers-Briggs Company: preference guide</a>
+      · <a href="https://www.myersbriggs.org/type-in-my-life/personality-type-and-relationships/" target="_blank" rel="noopener" style="color:var(--accent)">The Myers-Briggs Company: relationship guidance</a>
+    </div>
+  </div>
+
+  <section class="quick-check mb-4" id="quick-check" aria-labelledby="quick-check-title">
+    <div class="d-flex align-items-start justify-content-between gap-3 flex-wrap mb-3">
+      <div>
+        <h2 id="quick-check-title" style="font-size:1.12rem;font-weight:800;color:#fff;margin:0 0 .35rem"><i class="bi bi-ui-checks-grid me-2" style="color:var(--accent2)"></i>12-question preference check</h2>
+        <p style="font-size:.82rem;color:#ccc;line-height:1.65;margin:0">Choose what feels more natural most of the time. There are no better answers.</p>
+      </div>
+      <span style="font-size:.7rem;color:#d8b4fe;border:1px solid #c77dff66;border-radius:14px;padding:.25rem .65rem">About 2 minutes</span>
+    </div>
+    <form id="quick-form">
+      <div class="row g-3">
+        <div class="col-lg-6">
+          <fieldset class="quick-q"><legend>1. After a busy week, I usually recharge by…</legend><label class="quick-choice"><input type="radio" name="q1" value="E">spending time and talking with people</label><label class="quick-choice"><input type="radio" name="q1" value="I">having quiet time with my own thoughts</label></fieldset>
+          <fieldset class="quick-q"><legend>2. When I have an idea, I prefer to…</legend><label class="quick-choice"><input type="radio" name="q2" value="E">talk it through as I develop it</label><label class="quick-choice"><input type="radio" name="q2" value="I">think it through before I share it</label></fieldset>
+          <fieldset class="quick-q"><legend>3. In a new group, I am more likely to…</legend><label class="quick-choice"><input type="radio" name="q3" value="E">start conversations and join quickly</label><label class="quick-choice"><input type="radio" name="q3" value="I">observe first and join gradually</label></fieldset>
+
+          <fieldset class="quick-q"><legend>4. I trust information more when it is…</legend><label class="quick-choice"><input type="radio" name="q4" value="S">specific, practical, and observable</label><label class="quick-choice"><input type="radio" name="q4" value="N">connected to patterns and possibilities</label></fieldset>
+          <fieldset class="quick-q"><legend>5. When learning something new, I prefer…</legend><label class="quick-choice"><input type="radio" name="q5" value="S">clear examples and step-by-step practice</label><label class="quick-choice"><input type="radio" name="q5" value="N">the big picture and room to explore</label></fieldset>
+          <fieldset class="quick-q"><legend>6. I naturally notice…</legend><label class="quick-choice"><input type="radio" name="q6" value="S">facts, details, and what is happening now</label><label class="quick-choice"><input type="radio" name="q6" value="N">meanings, connections, and what could happen</label></fieldset>
+        </div>
+        <div class="col-lg-6">
+          <fieldset class="quick-q"><legend>7. In a difficult decision, I first consider…</legend><label class="quick-choice"><input type="radio" name="q7" value="T">consistent principles and likely results</label><label class="quick-choice"><input type="radio" name="q7" value="F">people's needs and my values</label></fieldset>
+          <fieldset class="quick-q"><legend>8. When giving feedback, I tend to emphasize…</legend><label class="quick-choice"><input type="radio" name="q8" value="T">accuracy and what can be improved</label><label class="quick-choice"><input type="radio" name="q8" value="F">encouragement and how it may be received</label></fieldset>
+          <fieldset class="quick-q"><legend>9. During disagreement, I am persuaded more by…</legend><label class="quick-choice"><input type="radio" name="q9" value="T">clear reasoning and evidence</label><label class="quick-choice"><input type="radio" name="q9" value="F">shared values and human impact</label></fieldset>
+
+          <fieldset class="quick-q"><legend>10. My days feel easier when…</legend><label class="quick-choice"><input type="radio" name="q10" value="J">plans and priorities are settled</label><label class="quick-choice"><input type="radio" name="q10" value="P">I can adapt and keep options open</label></fieldset>
+          <fieldset class="quick-q"><legend>11. For a deadline, I usually prefer to…</legend><label class="quick-choice"><input type="radio" name="q11" value="J">start early and finish in stages</label><label class="quick-choice"><input type="radio" name="q11" value="P">work flexibly as ideas and energy arrive</label></fieldset>
+          <fieldset class="quick-q"><legend>12. On a trip, I enjoy having…</legend><label class="quick-choice"><input type="radio" name="q12" value="J">a decided schedule and reservations</label><label class="quick-choice"><input type="radio" name="q12" value="P">space for spontaneous changes</label></fieldset>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary mt-2"><i class="bi bi-stars me-2"></i>Show my likely preferences</button>
+      <span id="quick-error" style="display:none;color:#ff8b8b;font-size:.8rem;margin-left:.75rem">Please answer all 12 questions.</span>
+    </form>
+    <div class="quick-result" id="quick-result" aria-live="polite">
+      <div style="font-size:.68rem;color:var(--muted);letter-spacing:1.3px;text-transform:uppercase">Your current preference pattern</div>
+      <div id="quick-type" style="font-size:2.2rem;font-weight:900;color:#d8b4fe;letter-spacing:4px;margin:.15rem 0"></div>
+      <div id="quick-detail" style="font-size:.82rem;color:#ccc;line-height:1.7"></div>
+      <div style="font-size:.75rem;color:var(--muted);line-height:1.6;margin-top:.7rem">This short check is an informal reflection aid, not the official MBTI® assessment. Review the type description below and decide whether it fits you.</div>
+      <button type="button" id="quick-use" class="btn btn-outline-light btn-sm mt-3"><i class="bi bi-arrow-return-left me-1"></i>Use this in DharmaVera</button>
+    </div>
+  </section>
+
+  <!-- ═══ ANALYSTS (NT) ═══ -->
+  <div class="temp-header" style="border-color:var(--c-nt)">
+    <div style="font-size:1.8rem">🔭</div>
+    <div>
+      <h2 style="color:var(--c-nt)">Analysts (NT) — Intuitive Thinkers</h2>
+      <div style="font-size:.78rem;color:var(--muted);font-weight:400">INTJ · INTP · ENTJ · ENTP</div>
+    </div>
+  </div>
+  <p class="temp-desc">Analysts are driven by logic, strategy, and the pursuit of knowledge. They trust their intuition and make decisions through objective analysis. Independent, innovative, and often visionary — they excel at seeing the big picture and building systems to achieve it.</p>
+  <div class="row g-3">
+    <div class="col-sm-6">
+      <div class="type-card" id="INTJ">
+        <div class="d-flex align-items-start justify-content-between">
+          <div>
+            <div class="type-code" style="color:var(--c-nt)">INTJ</div>
+            <div class="type-name">🏛️ The Architect</div>
+          </div>
+          <div class="type-emoji">🏛️</div>
+        </div>
+        <p style="font-size:.85rem;color:#ccc;line-height:1.75;margin:.75rem 0">Strategic visionaries who combine fierce independence with methodical planning. They set high standards for themselves and others, and will not rest until they've achieved their goals. Private but deeply passionate about their ideas.</p>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem;font-weight:700">KEY TRAITS</div>
+        <div class="row g-1 mb-3">
+          <div class="col-6"><div class="trait-label"><span>Strategic</span><span>9/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:90%;background:var(--c-nt)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Independent</span><span>10/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:100%;background:var(--c-nt)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Decisive</span><span>8/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:80%;background:var(--c-nt)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Empathetic</span><span>4/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:40%;background:var(--c-nt)"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="type-card" id="INTP">
+        <div class="d-flex align-items-start justify-content-between">
+          <div>
+            <div class="type-code" style="color:var(--c-nt)">INTP</div>
+            <div class="type-name">🔬 The Thinker</div>
+          </div>
+          <div class="type-emoji">🔬</div>
+        </div>
+        <p style="font-size:.85rem;color:#ccc;line-height:1.75;margin:.75rem 0">Endlessly curious minds who love theoretical exploration and precise analysis. They find joy in picking apart complex ideas and building mental frameworks. Quiet and reserved in social settings, but brilliantly energetic when discussing ideas they love.</p>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem;font-weight:700">KEY TRAITS</div>
+        <div class="row g-1 mb-3">
+          <div class="col-6"><div class="trait-label"><span>Analytical</span><span>10/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:100%;background:var(--c-nt)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Creative</span><span>8/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:80%;background:var(--c-nt)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Organised</span><span>4/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:40%;background:var(--c-nt)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Social</span><span>3/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:30%;background:var(--c-nt)"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="type-card" id="ENTJ">
+        <div class="d-flex align-items-start justify-content-between">
+          <div>
+            <div class="type-code" style="color:var(--c-nt)">ENTJ</div>
+            <div class="type-name">⚡ The Commander</div>
+          </div>
+          <div class="type-emoji">⚡</div>
+        </div>
+        <p style="font-size:.85rem;color:#ccc;line-height:1.75;margin:.75rem 0">Often direct and goal-focused, ENTJs may enjoy organising people and systems toward an objective. They tend to value efficiency, competence, and forward movement.</p>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem;font-weight:700">KEY TRAITS</div>
+        <div class="row g-1 mb-3">
+          <div class="col-6"><div class="trait-label"><span>Leadership</span><span>10/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:100%;background:var(--c-nt)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Decisive</span><span>9/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:90%;background:var(--c-nt)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Ambitious</span><span>10/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:100%;background:var(--c-nt)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Patient</span><span>3/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:30%;background:var(--c-nt)"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="type-card" id="ENTP">
+        <div class="d-flex align-items-start justify-content-between">
+          <div>
+            <div class="type-code" style="color:var(--c-nt)">ENTP</div>
+            <div class="type-name">💡 The Debater</div>
+          </div>
+          <div class="type-emoji">💡</div>
+        </div>
+        <p style="font-size:.85rem;color:#ccc;line-height:1.75;margin:.75rem 0">Quick-witted innovators who love to challenge assumptions and explore every angle of an idea. They thrive in debate, play devil's advocate for fun, and get bored easily by routine. Visionary and resourceful — they can talk their way into (and out of) almost anything.</p>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem;font-weight:700">KEY TRAITS</div>
+        <div class="row g-1 mb-3">
+          <div class="col-6"><div class="trait-label"><span>Innovative</span><span>10/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:100%;background:var(--c-nt)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Charismatic</span><span>8/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:80%;background:var(--c-nt)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Consistent</span><span>4/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:40%;background:var(--c-nt)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Diplomatic</span><span>4/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:40%;background:var(--c-nt)"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DIPLOMATS (NF) ═══ -->
+  <div class="temp-header" style="border-color:var(--c-nf)">
+    <div style="font-size:1.8rem">🌿</div>
+    <div>
+      <h2 style="color:var(--c-nf)">Diplomats (NF) — Intuitive Feelers</h2>
+      <div style="font-size:.78rem;color:var(--muted);font-weight:400">INFJ · INFP · ENFJ · ENFP</div>
+    </div>
+  </div>
+  <p class="temp-desc">Diplomats are guided by their values and a deep desire to make a positive impact on the world. Empathetic and idealistic, they connect with others on a profound level and are natural advocates, counsellors, and inspirers. They see potential in everyone and believe strongly in human growth.</p>
+  <div class="row g-3">
+    <div class="col-sm-6">
+      <div class="type-card" id="INFJ">
+        <div class="d-flex align-items-start justify-content-between">
+          <div><div class="type-code" style="color:var(--c-nf)">INFJ</div><div class="type-name">🌿 The Advocate</div></div>
+          <div class="type-emoji">🌿</div>
+        </div>
+        <p style="font-size:.85rem;color:#ccc;line-height:1.75;margin:.75rem 0">INFJs are often described as private, values-led, and attentive to patterns in people and ideas. They may seek purpose in their work and relationships while keeping much of their inner life private.</p>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem;font-weight:700">KEY TRAITS</div>
+        <div class="row g-1 mb-3">
+          <div class="col-6"><div class="trait-label"><span>Insightful</span><span>10/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:100%;background:var(--c-nf)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Empathetic</span><span>9/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:90%;background:var(--c-nf)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Organised</span><span>7/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:70%;background:var(--c-nf)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Assertive</span><span>4/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:40%;background:var(--c-nf)"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="type-card" id="INFP">
+        <div class="d-flex align-items-start justify-content-between">
+          <div><div class="type-code" style="color:var(--c-nf)">INFP</div><div class="type-name">🌸 The Mediator</div></div>
+          <div class="type-emoji">🌸</div>
+        </div>
+        <p style="font-size:.85rem;color:#ccc;line-height:1.75;margin:.75rem 0">Poetic idealists guided by deep personal values and a rich inner world. They care intensely about authenticity, meaning, and helping others grow. Often creative and introspective, they may appear quiet but hold enormous passion beneath the surface.</p>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem;font-weight:700">KEY TRAITS</div>
+        <div class="row g-1 mb-3">
+          <div class="col-6"><div class="trait-label"><span>Empathetic</span><span>10/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:100%;background:var(--c-nf)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Creative</span><span>9/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:90%;background:var(--c-nf)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Decisive</span><span>3/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:30%;background:var(--c-nf)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Practical</span><span>4/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:40%;background:var(--c-nf)"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="type-card" id="ENFJ">
+        <div class="d-flex align-items-start justify-content-between">
+          <div><div class="type-code" style="color:var(--c-nf)">ENFJ</div><div class="type-name">🌟 The Protagonist</div></div>
+          <div class="type-emoji">🌟</div>
+        </div>
+        <p style="font-size:.85rem;color:#ccc;line-height:1.75;margin:.75rem 0">Charismatic natural leaders who genuinely care about inspiring others to reach their potential. They radiate warmth and confidence, make excellent mentors, and feel most alive when they are making a positive difference in people's lives.</p>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem;font-weight:700">KEY TRAITS</div>
+        <div class="row g-1 mb-3">
+          <div class="col-6"><div class="trait-label"><span>Charismatic</span><span>10/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:100%;background:var(--c-nf)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Empathetic</span><span>9/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:90%;background:var(--c-nf)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Organised</span><span>7/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:70%;background:var(--c-nf)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Self-care</span><span>4/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:40%;background:var(--c-nf)"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="type-card" id="ENFP">
+        <div class="d-flex align-items-start justify-content-between">
+          <div><div class="type-code" style="color:var(--c-nf)">ENFP</div><div class="type-name">🎨 The Campaigner</div></div>
+          <div class="type-emoji">🎨</div>
+        </div>
+        <p style="font-size:.85rem;color:#ccc;line-height:1.75;margin:.75rem 0">Free-spirited, enthusiastic, and endlessly curious about people and ideas. ENFPs see life as full of possibilities and can light up any room with their warmth and creativity. They have a rare combination of imagination and genuine care for others.</p>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem;font-weight:700">KEY TRAITS</div>
+        <div class="row g-1 mb-3">
+          <div class="col-6"><div class="trait-label"><span>Enthusiastic</span><span>10/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:100%;background:var(--c-nf)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Creative</span><span>9/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:90%;background:var(--c-nf)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Focused</span><span>4/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:40%;background:var(--c-nf)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Organised</span><span>3/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:30%;background:var(--c-nf)"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SENTINELS (SJ) ═══ -->
+  <div class="temp-header" style="border-color:var(--c-sj)">
+    <div style="font-size:1.8rem">🛡️</div>
+    <div>
+      <h2 style="color:var(--c-sj)">Sentinels (SJ) — Observant Judgers</h2>
+      <div style="font-size:.78rem;color:var(--muted);font-weight:400">ISTJ · ISFJ · ESTJ · ESFJ</div>
+    </div>
+  </div>
+  <p class="temp-desc">Sentinels are the backbone of society — reliable, hardworking, and dedicated to maintaining order and tradition. They value stability, loyalty, and fulfilling their responsibilities. Practical and detail-oriented, they build and preserve the structures that communities depend on.</p>
+  <div class="row g-3">
+    <div class="col-sm-6">
+      <div class="type-card" id="ISTJ">
+        <div class="d-flex align-items-start justify-content-between">
+          <div><div class="type-code" style="color:var(--c-sj)">ISTJ</div><div class="type-name">📋 The Logistician</div></div>
+          <div class="type-emoji">📋</div>
+        </div>
+        <p style="font-size:.85rem;color:#ccc;line-height:1.75;margin:.75rem 0">ISTJs often value reliability, facts, clear responsibilities, and steady follow-through. They may be reserved while showing loyalty through practical support and consistency.</p>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem;font-weight:700">KEY TRAITS</div>
+        <div class="row g-1 mb-3">
+          <div class="col-6"><div class="trait-label"><span>Reliable</span><span>10/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:100%;background:var(--c-sj)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Organised</span><span>9/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:90%;background:var(--c-sj)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Adaptable</span><span>3/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:30%;background:var(--c-sj)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Social</span><span>4/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:40%;background:var(--c-sj)"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="type-card" id="ISFJ">
+        <div class="d-flex align-items-start justify-content-between">
+          <div><div class="type-code" style="color:var(--c-sj)">ISFJ</div><div class="type-name">🛡️ The Defender</div></div>
+          <div class="type-emoji">🛡️</div>
+        </div>
+        <p style="font-size:.85rem;color:#ccc;line-height:1.75;margin:.75rem 0">Warm, caring, and extraordinarily attentive to the needs of others. ISFJs have excellent memories for personal details and go out of their way to make people feel comfortable and valued. They give more than they take and often need reminding to care for themselves too.</p>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem;font-weight:700">KEY TRAITS</div>
+        <div class="row g-1 mb-3">
+          <div class="col-6"><div class="trait-label"><span>Caring</span><span>10/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:100%;background:var(--c-sj)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Reliable</span><span>9/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:90%;background:var(--c-sj)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Assertive</span><span>3/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:30%;background:var(--c-sj)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Adaptable</span><span>4/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:40%;background:var(--c-sj)"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="type-card" id="ESTJ">
+        <div class="d-flex align-items-start justify-content-between">
+          <div><div class="type-code" style="color:var(--c-sj)">ESTJ</div><div class="type-name">⚖️ The Executive</div></div>
+          <div class="type-emoji">⚖️</div>
+        </div>
+        <p style="font-size:.85rem;color:#ccc;line-height:1.75;margin:.75rem 0">Pillars of the community who value tradition, order, and getting things done. ESTJs excel at organising people and processes, are direct about their opinions, and have a powerful work ethic. They hold themselves and others to high standards and expect those standards to be met.</p>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem;font-weight:700">KEY TRAITS</div>
+        <div class="row g-1 mb-3">
+          <div class="col-6"><div class="trait-label"><span>Organised</span><span>10/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:100%;background:var(--c-sj)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Reliable</span><span>9/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:90%;background:var(--c-sj)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Flexible</span><span>3/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:30%;background:var(--c-sj)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Empathetic</span><span>4/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:40%;background:var(--c-sj)"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="type-card" id="ESFJ">
+        <div class="d-flex align-items-start justify-content-between">
+          <div><div class="type-code" style="color:var(--c-sj)">ESFJ</div><div class="type-name">🤝 The Consul</div></div>
+          <div class="type-emoji">🤝</div>
+        </div>
+        <p style="font-size:.85rem;color:#ccc;line-height:1.75;margin:.75rem 0">Warm-hearted community builders who thrive when helping those around them. ESFJs are deeply attentive to others' needs, highly social, and take their duties seriously. They love hosting, nurturing relationships, and creating environments where everyone feels included.</p>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem;font-weight:700">KEY TRAITS</div>
+        <div class="row g-1 mb-3">
+          <div class="col-6"><div class="trait-label"><span>Caring</span><span>10/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:100%;background:var(--c-sj)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Social</span><span>9/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:90%;background:var(--c-sj)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Independent</span><span>4/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:40%;background:var(--c-sj)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Risk-taking</span><span>3/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:30%;background:var(--c-sj)"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ EXPLORERS (SP) ═══ -->
+  <div class="temp-header" style="border-color:var(--c-sp)">
+    <div style="font-size:1.8rem">🏄</div>
+    <div>
+      <h2 style="color:var(--c-sp)">Explorers (SP) — Observant Perceivers</h2>
+      <div style="font-size:.78rem;color:var(--muted);font-weight:400">ISTP · ISFP · ESTP · ESFP</div>
+    </div>
+  </div>
+  <p class="temp-desc">Explorers are often described as spontaneous, adaptable, and attentive to the present moment. Hands-on and pragmatic, they may prefer direct experience to extended theorising.</p>
+  <div class="row g-3">
+    <div class="col-sm-6">
+      <div class="type-card" id="ISTP">
+        <div class="d-flex align-items-start justify-content-between">
+          <div><div class="type-code" style="color:var(--c-sp)">ISTP</div><div class="type-name">🔧 The Virtuoso</div></div>
+          <div class="type-emoji">🔧</div>
+        </div>
+        <p style="font-size:.85rem;color:#ccc;line-height:1.75;margin:.75rem 0">ISTPs may enjoy understanding tools and systems through direct experimentation. They are often described as practical, independent, curious, and comfortable adapting as situations change.</p>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem;font-weight:700">KEY TRAITS</div>
+        <div class="row g-1 mb-3">
+          <div class="col-6"><div class="trait-label"><span>Practical</span><span>10/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:100%;background:var(--c-sp)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Calm</span><span>9/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:90%;background:var(--c-sp)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Expressive</span><span>3/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:30%;background:var(--c-sp)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Committed</span><span>4/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:40%;background:var(--c-sp)"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="type-card" id="ISFP">
+        <div class="d-flex align-items-start justify-content-between">
+          <div><div class="type-code" style="color:var(--c-sp)">ISFP</div><div class="type-name">🎭 The Adventurer</div></div>
+          <div class="type-emoji">🎭</div>
+        </div>
+        <p style="font-size:.85rem;color:#ccc;line-height:1.75;margin:.75rem 0">Gentle free spirits who live fully in the present and experience the world through beauty and sensation. Quiet and artistic, ISFPs have strong personal values but rarely impose them on others. They move through life with an open heart and an eye for aesthetic detail.</p>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem;font-weight:700">KEY TRAITS</div>
+        <div class="row g-1 mb-3">
+          <div class="col-6"><div class="trait-label"><span>Artistic</span><span>9/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:90%;background:var(--c-sp)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Empathetic</span><span>8/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:80%;background:var(--c-sp)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Assertive</span><span>3/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:30%;background:var(--c-sp)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Planned</span><span>3/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:30%;background:var(--c-sp)"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="type-card" id="ESTP">
+        <div class="d-flex align-items-start justify-content-between">
+          <div><div class="type-code" style="color:var(--c-sp)">ESTP</div><div class="type-name">🏄 The Entrepreneur</div></div>
+          <div class="type-emoji">🏄</div>
+        </div>
+        <p style="font-size:.85rem;color:#ccc;line-height:1.75;margin:.75rem 0">Bold, action-oriented risk-takers who thrive in fast-paced environments. ESTPs live in the moment, are perceptive about people, and have a natural flair for business and negotiation. They would rather do something — even imperfectly — than spend time planning.</p>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem;font-weight:700">KEY TRAITS</div>
+        <div class="row g-1 mb-3">
+          <div class="col-6"><div class="trait-label"><span>Bold</span><span>9/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:90%;background:var(--c-sp)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Perceptive</span><span>8/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:80%;background:var(--c-sp)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Patient</span><span>3/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:30%;background:var(--c-sp)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Sensitive</span><span>3/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:30%;background:var(--c-sp)"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div class="type-card" id="ESFP">
+        <div class="d-flex align-items-start justify-content-between">
+          <div><div class="type-code" style="color:var(--c-sp)">ESFP</div><div class="type-name">🎉 The Entertainer</div></div>
+          <div class="type-emoji">🎉</div>
+        </div>
+        <p style="font-size:.85rem;color:#ccc;line-height:1.75;margin:.75rem 0">ESFPs are often described as sociable, spontaneous, and attentive to the present moment. They may enjoy shared experiences, practical action, and bringing warmth and energy to a group.</p>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:.5rem;font-weight:700">KEY TRAITS</div>
+        <div class="row g-1 mb-3">
+          <div class="col-6"><div class="trait-label"><span>Energetic</span><span>10/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:100%;background:var(--c-sp)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Social</span><span>10/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:100%;background:var(--c-sp)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Focused</span><span>3/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:30%;background:var(--c-sp)"></div></div></div>
+          <div class="col-6"><div class="trait-label"><span>Planned</span><span>2/10</span></div><div class="trait-bar-wrap"><div class="trait-bar" style="width:20%;background:var(--c-sp)"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Disclaimer -->
+  <div style="background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;margin-top:2rem;font-size:.82rem;color:var(--muted);line-height:1.75">
+    <i class="bi bi-info-circle me-1"></i><strong style="color:var(--text)">For self-reflection only.</strong> This DharmaVera preference check is not the official MBTI® assessment or a clinical diagnostic tool. Types describe broad preferences, not abilities, fixed rules, or relationship outcomes.
+    <a href="terms.html" style="color:var(--accent);margin-left:.35rem">Terms &amp; Conditions</a>
+  </div>
+
+</div>
+
+<footer class="text-center py-4 mt-2">
+  <div class="container">
+    <p class="mb-1">© 2026 DharmaVera · <a href="biorhythm.php" style="color:var(--muted)">My DharmaVera</a></p>
+    <p class="mb-0" style="font-size:.75rem"><a href="privacy.html" style="color:var(--muted)">Privacy Policy</a> · <a href="terms.html" style="color:var(--muted)">Terms &amp; Conditions</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  const form = document.getElementById('quick-form');
+  const result = document.getElementById('quick-result');
+  const error = document.getElementById('quick-error');
+  const typeEl = document.getElementById('quick-type');
+  const detailEl = document.getElementById('quick-detail');
+  const useBtn = document.getElementById('quick-use');
+  let currentType = '';
+  const pairs = [['E','I','Energy'],['S','N','Information'],['T','F','Decisions'],['J','P','Lifestyle']];
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    const data = new FormData(form);
+    if ([...Array(12)].some((_,i) => !data.get('q'+(i+1)))) {
+      error.style.display = 'inline'; result.style.display = 'none'; return;
+    }
+    error.style.display = 'none';
+    const scores = {E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0};
+    for (let i=1;i<=12;i++) scores[data.get('q'+i)]++;
+    currentType = pairs.map(([a,b]) => scores[a] > scores[b] ? a : b).join('');
+    typeEl.textContent = currentType;
+    detailEl.innerHTML = pairs.map(([a,b,label]) => `<strong style="color:var(--text)">${label}:</strong> ${a} ${scores[a]} · ${b} ${scores[b]}`).join('<br>');
+    result.style.display = 'block';
+    result.scrollIntoView({behavior:'smooth',block:'nearest'});
+  });
+
+  useBtn.addEventListener('click', function () {
+    if (!currentType) return;
+    try { localStorage.setItem('dharmavera_mbti_result', currentType); } catch (_) {}
+    let applied = false;
+    try {
+      if (window.opener && typeof window.opener.applyQuickMBTI === 'function') {
+        applied = window.opener.applyQuickMBTI(currentType) === true;
+        window.opener.focus();
+      }
+    } catch (_) {}
+    useBtn.innerHTML = applied
+      ? '<i class="bi bi-check-circle me-1"></i>Applied — return to DharmaVera and save'
+      : '<i class="bi bi-check-circle me-1"></i>Saved — open DharmaVera to apply';
+  });
+})();
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.dharmavera.app",
+      "sha256_cert_fingerprints": [
+        "E4:96:2F:A7:A6:6A:84:3F:37:DE:1C:A1:D4:2E:97:52:FD:A2:4C:80:1E:C8:20:6F:04:74:32:15:9B:0E:FF:E9"
+      ]
+    }
+  }
+]

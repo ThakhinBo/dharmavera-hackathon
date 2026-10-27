@@ -1,0 +1,10 @@
+﻿# Hackathon edition - secrets and local-only files are never committed.
+.env
+dv_private/hackathon_meta_key.php
+dv_private/hackathon_ai_debug.log
+hackathon_meta_key.php
+hackathon_ai_debug.log
+*.bak
+*.log
+hackdemo*_bak_*/
+southrule.com_doc/

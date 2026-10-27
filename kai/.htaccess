@@ -1,0 +1,29 @@
+# ── Baydin Admin Panel — Extra Security ──────────
+
+# Enable PHP
+AddType application/x-httpd-php8.4 .php
+
+# No directory listing
+Options -Indexes
+
+# Block everything except index.php and dashboard.php
+<FilesMatch "^(?!(index|dashboard)\.php$).*\.php$">
+    Require all denied
+</FilesMatch>
+
+# Block all non-PHP files except what's needed
+<FilesMatch "\.(sql|log|env|sh|bak|old|json|md)$">
+    Require all denied
+</FilesMatch>
+
+# Slow down brute force: limit to your own IP if you have a static one
+# Uncomment and set your IP:
+# Require ip 1.2.3.4
+# Require all denied
+
+# Prevent clickjacking
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "DENY"
+    Header always set Cache-Control "no-store, no-cache, must-revalidate"
+    Header always set Pragma "no-cache"
+</IfModule>

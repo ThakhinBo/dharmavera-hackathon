@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101d21">
+<title>Offline | DharmaVera</title>
+<link rel="icon" href="/favicon.ico?v=2" sizes="any">
+<style>
+  :root { --bg:#101d21; --card:#17292b; --accent:#b9d8bd; --gold:#e8c872; --text:#eef2e9; --muted:#a6bcb3; }
+  * { box-sizing:border-box; }
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px 16px;
+         background:radial-gradient(circle at 50% 30%, #24403f, var(--bg) 70%); color:var(--text);
+         font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; text-align:center; }
+  .card { max-width:380px; width:100%; background:var(--card); border:1px solid rgba(185,216,189,.2); border-radius:18px; padding:32px 24px; }
+  img { width:88px; height:88px; margin-bottom:16px; }
+  h1 { font-size:1.35rem; margin:0 0 8px; }
+  p { color:var(--muted); line-height:1.5; margin:0 0 22px; }
+  button { background:var(--accent); color:#101d21; border:0; border-radius:10px; padding:12px 26px; font-size:1rem; font-weight:600; cursor:pointer; }
+  small { display:block; margin-top:18px; color:var(--muted); font-size:.8rem; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <img src="/assets/brand/logo-160.png?v=1" alt="DharmaVera logo">
+    <h1>You're offline</h1>
+    <p>DharmaVera needs an internet connection for readings and your personal chart. Please check your connection and try again.</p>
+    <button type="button" onclick="location.reload()">Try again</button>
+    <small>✦ DharmaVera</small>
+  </div>
+</body>
+</html>

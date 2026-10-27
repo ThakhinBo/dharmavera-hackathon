@@ -1,0 +1,9 @@
+﻿<?php
+// TEMPLATE ONLY - never a real key.
+// Copy this file to dv_private/hackathon_meta_key.php OUTSIDE the web root
+// (a folder next to public_html on the server, not inside it) and put the real
+// Meta API key there. The real key file is git-ignored and is never committed.
+return [
+    'meta_api_key' => 'YOUR_META_API_KEY_HERE',
+    'meta_model' => 'muse-spark-1.1',
+];
