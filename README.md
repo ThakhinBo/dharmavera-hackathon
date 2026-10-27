@@ -1,6 +1,7 @@
 # DharmaVera - Hackathon Edition
 
 Live demo: https://southrule.com/?demo=1
+No login needed for judging. Guest demo only, do not login. Open https://southrule.com/?demo=1, tap 4 numbers, and draw.
 
 
 ## Track and theme
