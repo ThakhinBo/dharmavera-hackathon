@@ -1,8 +1,7 @@
-﻿# DharmaVera - Hackathon Edition
+# DharmaVera - Hackathon Edition
 
 Live demo: https://southrule.com/?demo=1
 
-Note: dharmavera.com is untouched and is NOT the demo. The hackathon demo runs only on southrule.com.
 
 ## Track and theme
 
